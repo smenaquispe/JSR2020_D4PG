@@ -246,7 +246,8 @@ with tf.Session(config = config) as sess:
 
     # Write the Tensorflow computation graph to file, now that it has been fully built
     writer.add_graph(sess.graph)
-    print('Done starting!')
+    print('Donesss starting!')
+    print(Settings.NUMBER_OF_EPISODES)
 
 
     ####################################################

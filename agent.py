@@ -24,6 +24,7 @@ from settings import Settings
 from build_neural_networks import BuildActorNetwork
 environment_file = __import__('environment_' + Settings.ENVIRONMENT) # importing the environment
 
+os.environ['PYVIRTUALDISPLAY_DISPLAYFD'] = '0'
 
 class Agent:
 
@@ -43,20 +44,31 @@ class Agent:
         self.learner_to_agent = learner_to_agent
 
         # Build this Agent's actor network
+
+        print("Building actor network for agent %i..." % self.n_agent)
         self.build_actor()
 
         # Build the operations to update the actor network
+        print("Building actor update operation for agent %i..." % self.n_agent)
         self.build_actor_update_operation()
 
         # Establish the summary functions for TensorBoard logging.
+        print("Creating summary functions for agent %i..." % self.n_agent)
         self.create_summary_functions()
         self.writer = writer
 
+        print("Agent %i ready to run!" % self.n_agent)
         # If we want to record video, launch one hidden display
-        if Settings.RECORD_VIDEO and self.n_agent == 1:
-            self.display = Display(visible = False, size = (1400,900))
-            self.display.start()
 
+
+        if Settings.RECORD_VIDEO and self.n_agent == 1:
+            print("Starting hidden display for agent %i..." % self.n_agent)
+            self.display = Display(visible = False, size = (1400,900))
+            print("Display started for agent %i!" % self.n_agent)
+            self.display.start()
+            print("Display started for agent %i!" % self.n_agent)
+
+        print("Agent %i ready to run!" % self.n_agent)
         print("Agent %i initialized!" % self.n_agent)
 
 
@@ -123,10 +135,13 @@ class Agent:
 
         # For all requested episodes or until user flags for a stop (via Ctrl + C)
         while episode_number <= Settings.NUMBER_OF_EPISODES and not stop_run_flag.is_set():
+            print("Episode number: ", episode_number, "Settings.NUMBER_OF_EPISODES: ", Settings.NUMBER_OF_EPISODES, "stop_run_flag: ", stop_run_flag.is_set())
 
             ####################################
             #### Getting this episode ready ####
             ####################################
+
+            print("Running episode %i for agent %i..." % (episode_number, self.n_agent))
 
             # Clearing the N-step memory for this episode
             self.n_step_memory.clear()
@@ -302,18 +317,22 @@ class Agent:
                 os.makedirs(os.path.dirname(Settings.MODEL_SAVE_DIRECTORY + self.filename + '/trajectories/'), exist_ok=True)
                 np.savetxt(Settings.MODEL_SAVE_DIRECTORY + self.filename + '/trajectories/' + str(episode_number) + '.txt',np.asarray(raw_state_log))
 
+                print("Actor " + str(self.n_agent) + " is putting data into the learner's queue...")
                 # Ask the learner to tell us the value distributions of the state-action pairs encountered in this episode
                 self.agent_to_learner.put((np.asarray(state_log), np.asarray(action_log), np.asarray(next_state_log), np.asarray(instantaneous_reward_log), np.asarray(done_log), np.asarray(discount_factor_log)))
 
                 # Wait for the results
                 try:
+                    print("Actor " + str(self.n_agent) + " is waiting for the learner to return the value distributions...")
                     critic_distributions, target_critic_distributions, projected_target_distribution, loss_log = self.learner_to_agent.get(timeout = 3)
 
                     bins = np.linspace(Settings.MIN_V, Settings.MAX_V, Settings.NUMBER_OF_BINS)
 
+                    print("Rendering episode " + str(episode_number) + " for agent " + str(self.n_agent) + "...")
                     # Render the episode
                     environment_file.render(np.asarray(raw_state_log), np.asarray(action_log), desired_pose, np.asarray(instantaneous_reward_log), np.asarray(cumulative_reward_log), critic_distributions, target_critic_distributions, projected_target_distribution, bins, np.asarray(loss_log), np.squeeze(np.asarray(guidance_position_log)), episode_number, self.filename, Settings.MODEL_SAVE_DIRECTORY)
 
+                    print("Episode " + str(episode_number) + " rendered for agent " + str(self.n_agent) + "!")
                 except queue.Empty:
                     print("Skipping this animation!")
                     raise SystemExit
