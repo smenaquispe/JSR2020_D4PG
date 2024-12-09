@@ -1,12 +1,22 @@
-# JSR2020_D4PG
-Open-sourced deep guidance implementation using the D4PG algorithm for spacecraft proximity operations as detailed in Hovell and Ulrich's JSR 2020 paper under review titled "Deep Reinforcement Learning for Spacecraft Proximity Operations Guidance"
+Link a los video de experimentos: [Link](https://drive.google.com/drive/folders/1j6qH25dwLaCWuYcc90q3ACvEelCI161T?usp=sharing)
 
-Built on Tensorflow 1.12.0
+Parametros usados para mi experimento:
+```python
+RECORD_VIDEO           = True
+VIDEO_RECORD_FREQUENCY = 5
+NUMBER_OF_ACTORS        = 6
+NUMBER_OF_EPISODES      = 100
+MAX_TRAINING_ITERATIONS = 1000000
+```
 
-To run, optionally modify settings in environment_envs123456.py and settings.py. Then run python3 on main.py to begin training.
+1. Tiempo de entrenamiento:
+- 51 minutos y 42 segundos
+2. Tiempo solo de renderizacion:
+- 57 minutos y 18 segundos
+3. Tiempo junto a la renderizacion:
+- 1 hora y 49 minutos
 
-Deep reinforcement learning is used to train a neural network to output velocity commands for a spacecraft to track using a conventional controller. This "deep guidance" technique is a possible solution to the simulation-to-reality problem. The task-solving ability of deep reinforcement learning is harnessed along with the ability of conventional control to perform well under model uncertainty.
+![Imagen de WhatsApp 2024-12-09 a las 15 44 24_07af6ce8](https://github.com/user-attachments/assets/2f959f3e-3d34-4b58-be77-df1d6de7e3ae)
 
-A video showing simulated and experimental results can be found here: https://youtu.be/n7K6aC5v0aY
+Parametros usados en el experimento original:
 
-Feel free to contact me if you have any questions! khovell@gmail.com
